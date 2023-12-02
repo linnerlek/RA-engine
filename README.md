@@ -2,6 +2,8 @@
 
 This project is an implementation of a Relational Algebra interpreter in Python. The RA-Engine allows you to run relational algebra queries in the terminal, providing a convenient way to manipulate and query relational databases.
 
+To use RA-Engine, ensure you have the PLY package installed. You can find the PLY package [here](https://www.dabeaz.com/ply/ply.html). 
+
 ## Features
 
 - **Terminal-Based Execution**: Run the RA-Engine from the command line with a simple command like `python3 RA.py company`, where "company" is the folder containing your database.
