@@ -1,54 +1,21 @@
-# Relational Algebra Engine
+# Relational Algebra Interpreter
 
-This project is a relational algebra engine developed as part of my CSC 1302 Honors Lab. While the parser and lexer were pre-existing components, significant coding efforts were dedicated to implementing core functionalities such as relation management, tuple operations, and relational algebra query execution.
+This project is an implementation of a Relational Algebra interpreter in Python. The RA-Engine allows you to run relational algebra queries in the terminal, providing a convenient way to manipulate and query relational databases.
 
-## Project Overview
+## Features
 
-The engine operates on a database stored in a directory named "company," which contains relevant `.dat` files representing the database schema and data. The user can interact with the engine through the terminal, executing relational algebra queries on the specified database.
+- **Terminal-Based Execution**: Run the RA-Engine from the command line with a simple command like `python3 RA.py company`, where "company" is the folder containing your database.
 
-### 1. Database Management
+- **Example Database Included**: Explore the functionality immediately with the provided example database folder. The project includes a sample dataset to help you get started.
 
-The `Database` class facilitates the addition, deletion, and retrieval of relations. It initializes the database by reading schema and data files, populating the in-memory database with relation instances.
+- **Query Examples**: A collection of seven example queries is included in a text file, demonstrating the syntax and capabilities of the RA-Engine. Simply run `python3 RA.py company` followed by the queries to see the results.
 
-### 2. Relation Operations
+## How to Use:
 
-The `Relation` class encompasses operations such as union, intersection, difference, projection, selection, renaming, and natural join. These operations are crucial for executing a wide range of relational algebra queries.
+1. Clone the repository.
+2. Navigate to the project directory in your terminal.
+3. Run the RA-Engine with the command `python3 RA.py <your-database-folder>`.
 
-### 3. Tuple Handling
+Feel free to customize the RA-Engine to fit your needs or contribute to its development. If you encounter any issues or have suggestions, please open an issue or pull request.
 
-The `Tuple` class manages tuple operations, including cloning, concatenation, projection, and selection. These functionalities ensure the efficient manipulation of tuple data within relations.
-
-## Example Queries
-
-Here are some example queries that can be executed using the engine:
-### Query 1
-
-Retrieve the name and address of employees who work for the "Research" department.
-
-```python
-project[fname,lname,address](
-  (rename[dname,dno,mgrssn,mgrstartdate](
-      select[dname='Research'](department)) 
-   join 
-   employee
-  )
-);
-```
-
-### Query 2
-
-For every project located in "Stafford," list the project number, the controlling department number, and the department manager's last name, address, and birth date.
-
-```python
-project[pnumber,dnum,lname,address,bdate](
-  (
-   (select[plocation='Stafford'](projects) 
-    join 
-    rename[dname,dnum,ssn,mgrstartdate](department)
-   )
-   join employee
-  )
-); 
-```
-
-Feel free to experiment with these queries to explore the capabilities of the relational algebra engine.
+**Note:** This project was created as part of a csc1302 honors lab, making it an excellent resource for students learning about relational databases and algebra.
