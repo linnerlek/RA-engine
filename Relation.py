@@ -7,7 +7,6 @@ class Relation:
         self.table = [] # list of tuple objects
 
     # Returns True if attribute with name aname exists in relation schema;
-    # False otherwise
     def attribute_exists(self, aname):
         return aname.upper() in self.attributes
 
@@ -59,8 +58,8 @@ class Relation:
                 return True
         return False
 
-    def union(self, r2): #USE CLONE FROM TUPLE
-       # Clone tuples from self and r2
+    def union(self, r2): 
+        # Clone tuples from self and r2
         self_cloned_tuples = [t.clone(self.attributes) for t in self.table]
         r2_cloned_tuples = [t.clone(self.attributes) for t in r2.table]
         
@@ -91,7 +90,7 @@ class Relation:
         return result
 
     def minus(self, r2): #USE CLONE FROM TUPLE
-         # Clone tuples from self and r2
+        # Clone tuples from self and r2
         self_cloned_tuples = [t.clone(self.attributes) for t in self.table]
         r2_cloned_tuples = [t.clone(self.attributes) for t in r2.table]
         
