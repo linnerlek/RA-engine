@@ -8,7 +8,6 @@ class Database:
         self.relations = {}
 
     # Add relation r to Dictionary if relation does not already exists.
-    # return True on successful add; False otherwise
     def addRelation(self,r):
         if r.name not in self.relations:
             self.relations[r.name] = r
@@ -17,7 +16,6 @@ class Database:
 
 
     # Delete relation with name rname from Dictionary if relation exists. 
-    # return True on successful delete; False otherwise
     def deleteRelation(self,rname):
         if rname in self.relations:
             del self.relations[rname]
@@ -25,7 +23,6 @@ class Database:
         return False
 
     # Retrieve and return relation with name rname from Dictionary.
-    # return None if it does not exist.
     def getRelation(self, rname):
         if rname in self.relations:
             return self.relations[rname]
