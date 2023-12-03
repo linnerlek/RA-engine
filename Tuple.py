@@ -9,14 +9,13 @@ class Tuple:
         self.tuple.append(comp)
 
     def __str__(self):
-    # Return String representation of tuple; See output of run for format.
+    # Return String representation of tuple
         result = ""
         for i in range(len(self.attributes)):
             result += f"{self.tuple[i]}:"
         return result
 
     # Return True if this tuple is equal to compareTuple; False otherwise
-    # make sure the schemas are the same; return False if schema's are not same
     def equals(self, compareTuple):
         if len(self.attributes) != len(compareTuple.attributes):
             return False
