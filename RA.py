@@ -69,7 +69,9 @@ def semantic_checks(tree, db):
 
         elif tree.node_type == "select":
             if tree.get_left_child() is not None:
-                semantic_checks(tree.get_left_child(), db)
+                s = semantic_checks(tree.get_left_child(), db)
+                if s != "OK":
+                    return s
 
             conditions = tree.get_conditions()
             for cond in conditions:
@@ -114,7 +116,10 @@ def semantic_checks(tree, db):
 
         elif tree.node_type == "rename":
             if tree.get_left_child() is not None:
-                semantic_checks(tree.get_left_child(), db)
+                s = semantic_checks(tree.get_left_child(), db)
+                if s != "OK":
+                    return s
+
                 new_attributes = tree.get_columns()
                 left_child_attributes = tree.get_left_child().get_attributes()
 
@@ -125,16 +130,15 @@ def semantic_checks(tree, db):
                     if len(new_attributes) != len(left_child_attributes):
                         return "Semantic Error: Not valid number of attributes in RENAME operation."
 
-                    for col in new_attributes:
-                        if col not in left_child_attributes:
-                            return f"Semantic Error: Attribute '{col}' not found in the schema."
-
-                    tree.set_attributes(new_attributes)
-                    tree.set_domains(tree.get_left_child().get_domains())
+                tree.set_attributes(new_attributes)
+                tree.set_domains(tree.get_left_child().get_domains())
 
         elif tree.node_type == "project":
             if tree.get_left_child() is not None:
-                semantic_checks(tree.get_left_child(), db)
+                s = semantic_checks(tree.get_left_child(), db)
+                if s != "OK":
+                    return s
+
             columns = tree.get_columns()
             left_child_attributes = tree.get_left_child().get_attributes()
             left_child_domains = tree.get_left_child().get_domains()
@@ -155,9 +159,14 @@ def semantic_checks(tree, db):
 
         elif tree.node_type in ["union", "minus", "intersect"]:
             if tree.get_left_child() is not None:
-                semantic_checks(tree.get_left_child(), db)
+                s = semantic_checks(tree.get_left_child(), db)
+                if s != "OK":
+                    return s
+
             if tree.get_right_child() is not None:
-                semantic_checks(tree.get_right_child(), db)
+                s = semantic_checks(tree.get_right_child(), db)
+                if s != "OK":
+                    return s
 
             left_attributes = tree.get_left_child().get_attributes()
             right_attributes = tree.get_right_child().get_attributes()
@@ -166,65 +175,78 @@ def semantic_checks(tree, db):
                 if len(left_attributes) != len(right_attributes):
                     return "Semantic Error: Relations do not have the same number of attributes."
 
-                for attr in left_attributes:
-                    if attr not in right_attributes:
-                        return "Semantic Error: Relations do not have the same attributes."
-                    left_attr_type = left_attributes[left_attributes.index(
-                        attr)]
-                    right_attr_type = right_attributes[right_attributes.index(
-                        attr)]
+                new_attributes = left_attributes.copy()
+                for attr in right_attributes:
+                    if attr not in left_attributes:
+                        new_attributes.append(attr)
 
-                    if left_attr_type != right_attr_type:
-                        return f"Semantic Error: Attributes '{attr}' do not have the same data types."
+                new_domains = tree.get_left_child().get_domains() + \
+                    tree.get_right_child().get_domains()
 
-            tree.set_attributes(left_attributes)
-            tree.set_domains(tree.get_left_child().get_domains())
+                tree.set_attributes(new_attributes)
+                tree.set_domains(new_domains)
 
         elif tree.node_type == "join":
             if tree.get_left_child() is not None:
-                semantic_checks(tree.get_left_child(), db)
+                s = semantic_checks(tree.get_left_child(), db)
+                if s != "OK":
+                    return s
             if tree.get_right_child() is not None:
-                semantic_checks(tree.get_right_child(), db)
+                s = semantic_checks(tree.get_right_child(), db)
+                if s != "OK":
+                    return s
 
             left_attributes = tree.get_left_child().get_attributes()
             right_attributes = tree.get_right_child().get_attributes()
 
             if left_attributes is not None and right_attributes is not None:
-                common_attributes = set(
-                    left_attributes) & set(right_attributes)
+                common_attributes = []
+                right_unique_attributes = []
 
-                if not common_attributes:
-                    return "Semantic Error: No common attributes for JOIN operation."
+                for attr in right_attributes:
+                    if attr in left_attributes:
+                        common_attributes.append(attr)
+                    elif attr not in right_unique_attributes:
+                        right_unique_attributes.append(attr)
 
-                right_unique_attributes = list(
-                    set(right_attributes) - common_attributes)
+                if common_attributes:
+                    for common_attr in common_attributes:
+                        left_index = left_attributes.index(common_attr)
+                        right_index = right_attributes.index(common_attr)
 
-                for common_attr in common_attributes:
-                    left_index = left_attributes.index(common_attr)
-                    right_index = right_attributes.index(common_attr)
+                        left_data_type = tree.get_left_child().get_domains()[
+                            left_index]
+                        right_data_type = tree.get_right_child().get_domains()[
+                            right_index]
 
-                    left_data_type = tree.get_left_child().get_domains()[
-                        left_index]
-                    right_data_type = tree.get_right_child().get_domains()[
-                        right_index]
+                        if left_data_type != right_data_type:
+                            return f"Semantic Error: Common attribute '{common_attr}' has different data types."
 
-                    if left_data_type != right_data_type:
-                        return f"Semantic Error: Common attribute '{common_attr}' has different data types."
-
-                tree.set_attributes(left_attributes + right_unique_attributes)
+                tree.set_attributes(left_attributes + right_attributes)
                 tree.set_domains(tree.get_left_child().get_domains(
                 ) + tree.get_right_child().get_domains())
 
         elif tree.node_type == "times":
             if tree.get_left_child() is not None:
-                semantic_checks(tree.get_left_child(), db)
+                s_left = semantic_checks(tree.get_left_child(), db)
+                if s_left != "OK":
+                    return s_left
+
             if tree.get_right_child() is not None:
-                semantic_checks(tree.get_right_child(), db)
+                s_right = semantic_checks(tree.get_right_child(), db)
+                if s_right != "OK":
+                    return s_right
+
+            left_attributes = tree.get_left_child().get_attributes()
+            right_attributes = tree.get_right_child().get_attributes()
+
+            left_domains = tree.get_left_child().get_domains()
+            right_domains = tree.get_right_child().get_domains()
 
             new_attributes = left_attributes + \
-                [attr for attr in right_attributes if attr not in common_attributes]
+                [attr for attr in right_attributes if attr not in left_attributes]
             new_domains = left_domains + [right_domains[right_attributes.index(
-                attr)] for attr in right_attributes if attr not in common_attributes]
+                attr)] for attr in right_attributes if attr not in left_attributes]
 
             tree.set_attributes(new_attributes)
             tree.set_domains(new_domains)
