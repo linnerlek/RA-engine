@@ -17,6 +17,5 @@ To use RA-Engine, ensure you have the PLY package installed. You can find the PL
 1. Clone the repository.
 2. Navigate to the project directory in your terminal.
 3. Run the RA-Engine with the command `python3 RA.py <your-database-folder>`.
-4. 
 
 **Note:** This project was created as part of a csc1302 honors lab, making it an excellent resource for students learning about relational databases and algebra.
